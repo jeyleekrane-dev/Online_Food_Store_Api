@@ -1,16 +1,9 @@
-# TODO for Food Ordering App Backend
+# TODO for Adding Favorites Feature
 
-- [ ] Install Django Rest Framework and dependencies
-- [ ] Update settings.py: add DRF to INSTALLED_APPS, configure media, auth
-- [ ] Create custom User model with roles (customer, seller)
-- [ ] Create Category model
-- [ ] Create FoodItem model
-- [ ] Create Order and OrderItem models
-- [ ] Create Cart and CartItem models
-- [ ] Create Review model
-- [ ] Create serializers.py with serializers for all models
-- [ ] Create views.py with ViewSets for CRUD operations
-- [ ] Create api/urls.py for routing
-- [ ] Update food_store/urls.py to include api.urls
-- [ ] Run migrations
-- [ ] Test the setup
+- [x] Add Favorite model to api/models.py
+- [x] Create FavoriteSerializer in api/serializers.py
+- [x] Create FavoriteViewSet in api/views.py
+- [x] Update api/urls.py to include FavoriteViewSet
+- [x] Run makemigrations
+- [x] Run migrate
+- [ ] Test the favorites endpoints

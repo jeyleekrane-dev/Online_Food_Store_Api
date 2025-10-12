@@ -99,3 +99,17 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.customer.username} for {self.food_item.name}"
+
+
+class Favorite(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={
+                                 'role': 'customer'}, related_name='favorites')
+    food_item = models.ForeignKey(
+        FoodItem, on_delete=models.CASCADE, related_name='favorited_by')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('customer', 'food_item')
+
+    def __str__(self):
+        return f"{self.customer.username} favorites {self.food_item.name}"

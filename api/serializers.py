@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Category, FoodItem, Order, OrderItem, Cart, CartItem, Review
+from .models import User, Category, FoodItem, Order, OrderItem, Cart, CartItem, Review, Favorite
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -99,4 +99,15 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
+        fields = '__all__'
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    food_item_name = serializers.CharField(
+        source='food_item.name', read_only=True)
+    food_item_price = serializers.DecimalField(
+        source='food_item.price', max_digits=10, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = Favorite
         fields = '__all__'

@@ -4,11 +4,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .models import User, Category, FoodItem, Order, OrderItem, Cart, CartItem, Review
+from .models import User, Category, FoodItem, Order, OrderItem, Cart, CartItem, Review, Favorite
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, CategorySerializer,
     FoodItemSerializer, OrderSerializer, OrderItemSerializer,
-    CartSerializer, CartItemSerializer, ReviewSerializer
+    CartSerializer, CartItemSerializer, ReviewSerializer, FavoriteSerializer
 )
 
 
@@ -152,3 +152,33 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Favorite.objects.filter(customer=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def add_favorite(self, request):
+        food_item_id = request.data.get('food_item_id')
+        food_item = FoodItem.objects.get(id=food_item_id)
+        favorite, created = Favorite.objects.get_or_create(
+            customer=request.user, food_item=food_item
+        )
+        if created:
+            return Response(FavoriteSerializer(favorite).data, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Already in favorites'}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def remove_favorite(self, request):
+        food_item_id = request.data.get('food_item_id')
+        Favorite.objects.filter(customer=request.user,
+                                food_item_id=food_item_id).delete()
+        return Response({'message': 'Removed from favorites'}, status=status.HTTP_200_OK)
