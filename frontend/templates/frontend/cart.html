@@ -1,0 +1,120 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+<h1>Your Cart</h1>
+
+{% if cart.items %}
+<div class="row">
+    {% for item in cart.items %}
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 class="card-title">{{ item.food_item.name }}</h5>
+                        <p class="card-text">{{ item.food_item.description }}</p>
+                        <p class="card-text">Quantity: {{ item.quantity }}</p>
+                        <p class="card-text">Price: ${{ item.food_item.price }}</p>
+                        <p class="card-text">Total: ${{ item.total|default:0 }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-danger remove-item"
+                            data-food-item-id="{{ item.food_item.id }}">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="text-end">
+    <h4>Total: ${{ cart.total_amount|default:0 }}</h4>
+    <button class="btn btn-primary" id="place-order">Place Order</button>
+</div>
+{% else %}
+<p>Your cart is empty.</p>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const removeButtons = document.querySelectorAll('.remove-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const foodItemId = this.getAttribute('data-food-item-id');
+                removeFromCart(foodItemId);
+            });
+        });
+
+        const placeOrderButton = document.getElementById('place-order');
+        if (placeOrderButton) {
+            placeOrderButton.addEventListener('click', function () {
+                placeOrder();
+            });
+        }
+
+        function removeFromCart(foodItemId) {
+            fetch('/api/carts/remove_item/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + getCookie('auth_token')
+                },
+                body: JSON.stringify({
+                    food_item_id: foodItemId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    location.reload();  // Reload to update cart
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function placeOrder() {
+            // First, get the cart data to get the cart id
+            fetch('/api/carts/my_cart/', {
+                headers: {
+                    'Authorization': 'Token ' + getCookie('auth_token')
+                }
+            })
+                .then(response => response.json())
+                .then(cartData => {
+                    if (cartData.id) {
+                        return fetch(`/api/orders/${cartData.id}/place_order/`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'Token ' + getCookie('auth_token')
+                            }
+                        });
+                    } else {
+                        throw new Error('Cart not found');
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Order placed successfully!');
+                    location.reload();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

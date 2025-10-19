@@ -1,0 +1,95 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Home - Online Food Store{% endblock %}
+
+{% block content %}
+<h1>Welcome to Online Food Store</h1>
+<p>Browse our delicious food items.</p>
+
+<h2>Categories</h2>
+<div class="row">
+    {% for category in categories %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ category.name }}</h5>
+                <p class="card-text">{{ category.description }}</p>
+                <a href="{% url 'food_items' %}?category={{ category.name }}" class="btn btn-primary">View Items</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<h2>Featured Food Items</h2>
+<div class="row">
+    {% for item in food_items %}
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <img src="{{ item.image }}" class="card-img-top" alt="{{ item.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.name }}</h5>
+                <p class="card-text">{{ item.description }}</p>
+                <p class="card-text"><strong>${{ item.price }}</strong></p>
+                <a href="#" class="btn btn-success add-to-cart" data-food-item-id="{{ item.id }}">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const foodItemId = this.getAttribute('data-food-item-id');
+                addToCart(foodItemId);
+            });
+        });
+
+        function addToCart(foodItemId) {
+            fetch('/api/carts/add_item/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + getCookie('auth_token')  // Assuming token is stored in cookie
+                },
+                body: JSON.stringify({
+                    food_item_id: foodItemId,
+                    quantity: 1
+                })
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/login/';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data) {
+                        alert('Item added to cart!');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

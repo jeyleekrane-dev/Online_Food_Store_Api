@@ -1,9 +1,15 @@
-# TODO for Adding Favorites Feature
-
-- [x] Add Favorite model to api/models.py
-- [x] Create FavoriteSerializer in api/serializers.py
-- [x] Create FavoriteViewSet in api/views.py
-- [x] Update api/urls.py to include FavoriteViewSet
-- [x] Run makemigrations
-- [x] Run migrate
-- [ ] Test the favorites endpoints
+- [x] Write tests for the login API in api/tests.py
+  - [x] Import necessary modules (APITestCase, get_user_model, status)
+  - [x] Create UserLoginTest class with setUp method to create a test user
+  - [x] Add test_login_success method to test successful login
+  - [x] Add test_login_wrong_password method to test login with wrong password
+  - [x] Add test_login_wrong_username method to test login with wrong username
+  - [x] Add test_login_missing_fields method to test login with missing fields
+- [x] Run the tests using python manage.py test api.tests.UserLoginTest
+- [x] Verify test results and fix any issues if necessary
+- [x] Create Django management command to populate database with sample data
+  - [x] Create api/management/commands/ directory structure
+  - [x] Create populate_db.py command with sample categories, users, food items, carts
+  - [x] Run python manage.py populate_db to populate the database
+  - [x] Verify data creation in output
+  - [x] Thoroughly test database population: verify counts, relationships, and sample data integrity using Django shell

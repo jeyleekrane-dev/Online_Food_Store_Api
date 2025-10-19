@@ -1,3 +1,4 @@
 # Online_Food_Store_Api
 
-this project comprises of both backend and frontend, the backend is implemented using django rest frame work while the frontend is implemented using flutter.....
+this project comprises of both backend and frontend, the backend is implemented using django rest frame work while the frontend is implemented using Django , it is a simple food app
+
